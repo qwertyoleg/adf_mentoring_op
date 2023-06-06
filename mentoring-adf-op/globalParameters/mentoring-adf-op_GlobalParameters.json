@@ -1,0 +1,6 @@
+{
+	"LogicAppAzurementoringlogappsopURL": {
+		"type": "string",
+		"value": "https://mentoring-key-vault-op1.vault.azure.net/secrets/LogicApp-azurementoringlogappsop-URL"
+	}
+}

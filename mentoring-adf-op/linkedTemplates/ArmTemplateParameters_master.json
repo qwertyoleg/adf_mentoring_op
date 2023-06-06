@@ -1,0 +1,80 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "mentoring-adf-op"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorageAzureSubscription_accountKey": {
+			"value": ""
+		},
+		"AzureFileStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabaseParametrized_connectionString": {
+			"value": ""
+		},
+		"SqlServer1_connectionString": {
+			"value": "Integrated Security=False;Data Source=EPUALVIW0B55\\MSSQLSERVERFORDF;Initial Catalog=CinemaTickets;User ID=localDBUser"
+		},
+		"toMyBLobStorage_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage service_sasUri": {
+			"value": ""
+		},
+		"AzureBlobStorage service_properties_typeProperties_sasToken_secretName": {
+			"value": "azurementoringstorageopMoviesURL"
+		},
+		"AzureBlobStorageOnlineContainer_sasUri": {
+			"value": ""
+		},
+		"AzureBlobStorageOnlineContainer_properties_typeProperties_sasToken_secretName": {
+			"value": "AzureBlobOnlineContainer"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://azurementoringdatalakeop.dfs.core.windows.net"
+		},
+		"AzureDataLakeStorageAzureSubscription_properties_typeProperties_url": {
+			"value": "https://azurementoringdatalakeop.dfs.core.windows.net/"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
+			"value": "movieUserConnectionString"
+		},
+		"DataMartLinkedService_properties_typeProperties_connectionString_secretName": {
+			"value": "DataMartConnectionString"
+		},
+		"linked_service_to_key_vault_properties_typeProperties_baseUrl": {
+			"value": "https://mentoring-key-vault-op1.vault.azure.net/"
+		},
+		"archive trigger_properties_typeProperties_scope": {
+			"value": "/subscriptions/3342c551-bb4e-4983-b506-d5ae969432c4/resourceGroups/azure-mentoring-op/providers/Microsoft.Storage/storageAccounts/azurementoringdatalakeop"
+		},
+		"filesAddedInMoreMoviesContainer_properties_typeProperties_scope": {
+			"value": "/subscriptions/3342c551-bb4e-4983-b506-d5ae969432c4/resourceGroups/azure-mentoring-op/providers/Microsoft.Storage/storageAccounts/azurementoringstorageop"
+		},
+		"files_written_properties_typeProperties_scope": {
+			"value": "/subscriptions/3342c551-bb4e-4983-b506-d5ae969432c4/resourceGroups/azure-mentoring-op/providers/Microsoft.Storage/storageAccounts/azurementoringdatalakeop"
+		},
+		"AzureDataLakeStorage491_properties_privateLinkResourceId": {
+			"value": "/subscriptions/3342c551-bb4e-4983-b506-d5ae969432c4/resourceGroups/azure-mentoring-op/providers/Microsoft.Storage/storageAccounts/azurementoringdatalakeop"
+		},
+		"AzureDataLakeStorage491_properties_groupId": {
+			"value": "dfs"
+		},
+		"AzureDataLakeStorage491_properties_fqdns": {
+			"value": [
+				"azurementoringdatalakeop.dfs.core.windows.net"
+			]
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

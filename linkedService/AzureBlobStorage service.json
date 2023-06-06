@@ -1,0 +1,19 @@
+{
+	"name": "AzureBlobStorage service",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"sasUri": "https://azurementoringstorageop.blob.core.windows.net/movies",
+			"sasToken": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "linked_service_to_key_vault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "azurementoringstorageopMoviesURL"
+			}
+		}
+	}
+}

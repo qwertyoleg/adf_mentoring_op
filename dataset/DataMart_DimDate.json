@@ -1,0 +1,83 @@
+{
+	"name": "DataMart_DimDate",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DataMartLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "TheDateKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TheDate",
+				"type": "date"
+			},
+			{
+				"name": "TheDay",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TheDayName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TheWeek",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TheISOWeek",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TheDayOfWeek",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TheMonth",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TheMonthName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TheQuarter",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TheYear",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TheFirstOfMonth",
+				"type": "date"
+			},
+			{
+				"name": "TheLastOfYear",
+				"type": "date"
+			},
+			{
+				"name": "TheDayOfYear",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimDate"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

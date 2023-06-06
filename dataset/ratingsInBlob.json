@@ -1,0 +1,19 @@
+{
+	"name": "ratingsInBlob",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "ratings.csv",
+				"container": "ratings"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

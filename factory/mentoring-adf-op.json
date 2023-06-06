@@ -1,0 +1,26 @@
+{
+	"name": "mentoring-adf-op",
+	"properties": {
+		"globalParameters": {
+			"LogicAppAzurementoringlogappsopURL": {
+				"type": "string",
+				"value": "https://mentoring-key-vault-op1.vault.azure.net/secrets/LogicApp-azurementoringlogappsop-URL"
+			}
+		},
+		"globalConfigurations": {
+			"PipelineBillingEnabled": "true"
+		}
+	},
+	"location": "francecentral",
+	"identity": {
+		"type": "SystemAssigned,UserAssigned",
+		"principalId": "27e05f42-5662-4110-9b0a-33112903bada",
+		"tenantId": "b41b72d0-4e9f-4c26-8a69-f949f367c91d",
+		"userAssignedIdentities": {
+			"/subscriptions/3342c551-bb4e-4983-b506-d5ae969432c4/resourcegroups/azure-mentoring-op/providers/Microsoft.ManagedIdentity/userAssignedIdentities/Logic-app-user": {
+				"clientId": "da52cedb-5e01-4778-9ba7-5093a9846b42",
+				"principalId": "dcf3e234-b1fd-47b3-8eb6-3ce7c782305a"
+			}
+		}
+	}
+}

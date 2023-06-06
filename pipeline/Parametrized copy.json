@@ -1,0 +1,620 @@
+{
+	"name": "Parametrized copy",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup control metadata table",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Stored procedure InsertLogPipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "movies_tControlMetadata",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup control metadata table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@json(string(activity('Lookup control metadata table').output.value))",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "set schema_and_table_name",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"additionalColumns": [
+										{
+											"name": "source_filename",
+											"value": "$$FILEPATH"
+										},
+										{
+											"name": "pipelineId",
+											"value": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											}
+										}
+									],
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": false,
+										"wildcardFolderPath": {
+											"value": "@item().SourceFolder",
+											"type": "Expression"
+										},
+										"wildcardFileName": {
+											"value": "@item().FileName",
+											"type": "Expression"
+										},
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "@{concat('truncate table ', variables('schema_and_table_name'))}",
+										"type": "Expression"
+									},
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": true,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"enableSkipIncompatibleRow": true,
+								"validateDataConsistency": true,
+								"dataIntegrationUnits": {
+									"value": "@item().DIUValue",
+									"type": "Expression"
+								},
+								"translator": {
+									"value": "@json(string(item().Mapping))",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "Parametrized_dataset",
+									"type": "DatasetReference",
+									"parameters": {
+										"container_name": {
+											"value": "@item().SourceContainer",
+											"type": "Expression"
+										},
+										"folder_name": {
+											"value": "@item(). SourceFolder",
+											"type": "Expression"
+										},
+										"file_name": {
+											"value": "@item().FileName",
+											"type": "Expression"
+										},
+										"column_delimiter": {
+											"value": "@item().ColumnDelimiter",
+											"type": "Expression"
+										},
+										"escape_charecter": {
+											"value": "@item().EscapeCharacter",
+											"type": "Expression"
+										},
+										"quote_character": {
+											"value": "@item().QuoteCharacter",
+											"type": "Expression"
+										},
+										"row_delimiter": {
+											"value": "@item().RowDelimiter",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "MoviesParameterized",
+									"type": "DatasetReference",
+									"parameters": {
+										"table_name": {
+											"value": "@item().DestinationTable",
+											"type": "Expression"
+										},
+										"schema_name": {
+											"value": "@item().DestinationSchema",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "set schema_and_table_name",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "schema_and_table_name",
+								"value": {
+									"value": "@concat(item().DestinationSchema,'.',item().DestinationTable)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Stored procedure InsertLogBilling",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[InsertLogBilling]",
+								"storedProcedureParameters": {
+									"Duration": {
+										"value": {
+											"value": "@activity('Copy data1').output.billingReference.billableDuration[0].duration",
+											"type": "Expression"
+										},
+										"type": "Double"
+									},
+									"MeterType": {
+										"value": {
+											"value": "@activity('Copy data1').output.billingReference.billableDuration[0].meterType",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"RunID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"Unit": {
+										"value": {
+											"value": "@activity('Copy data1').output.billingReference.billableDuration[0].unit",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Stored procedure InsertLogStatistics",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[InsertLogStatistics]",
+								"storedProcedureParameters": {
+									"CopiedRows": {
+										"value": {
+											"value": "@activity('Copy data1').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ParallelCopies": {
+										"value": {
+											"value": "@activity('Copy data1').output.usedParallelCopies",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ProcessedFiles": {
+										"value": {
+											"value": "@activity('Copy data1').output.filesRead",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ReadRows": {
+										"value": {
+											"value": "@activity('Copy data1').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"RunID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"UsedDIU": {
+										"value": {
+											"value": "@activity('Copy data1').output.usedDataIntegrationUnits",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Stored procedure InsertLogExecutionDetails",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[InsertLogExecutionDetails]",
+								"storedProcedureParameters": {
+									"CopyDuration": {
+										"value": {
+											"value": "@activity('Copy data1').output.copyDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"EndTime": {
+										"value": {
+											"value": "@activity('Copy data1').ExecutionEndTime",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"QueueDuration": {
+										"value": {
+											"value": "@activity('Copy data1').output.executionDetails[0].profile.queue.duration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"RunID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"StartTime": {
+										"value": {
+											"value": "@activity('Copy data1').output.executionDetails[0].start",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"Status": {
+										"value": {
+											"value": "@activity('Copy data1').output.executionDetails[0].status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"TransferDuration": {
+										"value": {
+											"value": "@activity('Copy data1').output.executionDetails[0].profile.transfer.duration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Stored procedure LogActivityError of Copy data activity",
+							"description": "log activity error in databaase",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[LogActivityError]",
+								"storedProcedureParameters": {
+									"ErrorCode": {
+										"value": {
+											"value": "@if(equals(activity('Copy data1').Error.errorCode,'InvalidTemplate'),activity('Copy data1').StatusCode,activity('Copy data1').Error.errorCode)",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ErrorDatetime": {
+										"value": {
+											"value": "@activity('Copy data1').ExecutionEndTime",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"ErrorMessage": {
+										"value": {
+											"value": "@activity('Copy data1').Error.Message",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"FailureType": {
+										"value": {
+											"value": "@activity('Copy data1').Error.FailureType",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineActivityName": {
+										"value": {
+											"value": "@string('Copy data1')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineName": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"RunID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Stored procedure InsertLogPipeline",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[etl].[InsertLogPipeline]",
+					"storedProcedureParameters": {
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Log Lookup metadata table table error",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Lookup control metadata table",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[etl].[LogActivityError]",
+					"storedProcedureParameters": {
+						"ErrorCode": {
+							"value": {
+								"value": "@activity('Lookup control metadata table').Error.errorCode",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"ErrorDatetime": {
+							"value": {
+								"value": "@activity('Lookup control metadata table').ExecutionEndTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"ErrorMessage": {
+							"value": {
+								"value": "@activity('Lookup control metadata table').Error.Message",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FailureType": {
+							"value": {
+								"value": "@activity('Lookup control metadata table').error.failureType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineActivityName": {
+							"value": {
+								"value": "@string('Lookup control metadata table')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"variables": {
+			"schema_and_table_name": {
+				"type": "String"
+			},
+			"mapping": {
+				"type": "String"
+			},
+			"meterType": {
+				"type": "String"
+			},
+			"duration": {
+				"type": "String"
+			},
+			"ActivityName": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-24T08:27:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

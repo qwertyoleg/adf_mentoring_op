@@ -1,0 +1,32 @@
+{
+	"name": "daily trigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Incremental load from local db",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-04-11T08:14:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						16
+					],
+					"hours": [
+						8
+					]
+				}
+			}
+		}
+	}
+}

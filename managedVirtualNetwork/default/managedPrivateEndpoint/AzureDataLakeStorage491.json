@@ -1,0 +1,10 @@
+{
+	"name": "AzureDataLakeStorage491",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/3342c551-bb4e-4983-b506-d5ae969432c4/resourceGroups/azure-mentoring-op/providers/Microsoft.Storage/storageAccounts/azurementoringdatalakeop",
+		"groupId": "dfs",
+		"fqdns": [
+			"azurementoringdatalakeop.dfs.core.windows.net"
+		]
+	}
+}

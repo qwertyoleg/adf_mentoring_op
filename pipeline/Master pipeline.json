@@ -1,0 +1,83 @@
+{
+	"name": "Master pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy files from blob to azure",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Copy files from blob to azure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "PopulateDBFromStage",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "populate stage tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PopulateDBFromStage",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "populate stage tables",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Copy files from blob to azure",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "populate stage tables",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Archive files pipeline",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "PopulateDBFromStage",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Archive files pipeline",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-03-24T15:20:43Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,89 @@
+{
+	"name": "filed parent pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Fail test",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Fail test",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Fail test",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Get logic app url from secret",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@decodeUriComponent(activity('Get logic app url from secret').output)",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": {
+						"value": "{\n\"dataFactoryName\" : \"@{pipeline().DataFactory}\", \n\"pipelineName\" : \"@{pipeline().Pipeline}\",\n\"ErrorMessage\": \"@{string(replace(activity('Fail test').output.errors[0].Message, '\"',''''))}\"\n\"Status\": \"@{activity('Fail test').output.status}\"\n   }",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Get logic app url from secret",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat(string(pipeline().globalParameters.LogicAppAzurementoringlogappsopURL), '?api-version=7.0')",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			}
+		],
+		"variables": {
+			"logicAppURL": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-06-05T11:39:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

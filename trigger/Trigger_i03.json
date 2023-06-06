@@ -1,0 +1,17 @@
+{
+	"name": "Trigger_i03",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 1,
+				"startTime": "2023-04-21T10:41:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

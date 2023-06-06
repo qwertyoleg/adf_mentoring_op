@@ -1,0 +1,143 @@
+{
+	"name": "Master pipline for Online Purchases",
+	"properties": {
+		"activities": [
+			{
+				"name": "Archive online purchases data",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Retrive online_purchise table new watermark value",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Archive online purchases data",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"TransactionDate": {
+							"value": "@activity('Retrive online_purchise table new watermark value').output.firstRow.newWatermark",
+							"type": "Expression"
+						},
+						"LastWatermarkDate": {
+							"value": "@activity('Retrive last watermark date').output.firstRow.Watermark",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Load data to online_purchase staging table",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Retrive last watermark date",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Load data to online_purchase staging table",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"LastWatermarkDate": {
+							"value": "@activity('Retrive last watermark date').output.firstRow.Watermark",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "load  tOnlineService and tOnlinePurchase tables",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Load data to online_purchase staging table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "load staging data to tOnlineService and tOnlinePurchase tables",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Retrive last watermark date",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT [Watermark]\n  FROM [dbo].[watermarkable]\n  where [TableName] = '[stg].[online_purchase]'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable_tOnlinePurchase",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Retrive online_purchise table new watermark value",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "load  tOnlineService and tOnlinePurchase tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT max([TransactionDate]) as newWatermark\n  FROM [dbo].[tOnlinePurchase]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "azureSQLDatabaseMovies_cinema_tickets",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-04-25T10:07:43Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

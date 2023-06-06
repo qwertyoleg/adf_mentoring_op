@@ -1,0 +1,17 @@
+{
+	"name": "archive trigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/raw/blobs/movies",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/3342c551-bb4e-4983-b506-d5ae969432c4/resourceGroups/azure-mentoring-op/providers/Microsoft.Storage/storageAccounts/azurementoringdatalakeop",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

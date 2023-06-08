@@ -14,6 +14,9 @@
 		"AzureFileStorage1_connectionString": {
 			"value": ""
 		},
+		"AzureSqlDatabase2_connectionString": {
+			"value": ""
+		},
 		"AzureSqlDatabaseParametrized_connectionString": {
 			"value": ""
 		},

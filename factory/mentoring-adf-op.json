@@ -5,6 +5,10 @@
 			"LogicAppAzurementoringlogappsopURL": {
 				"type": "string",
 				"value": "https://mentoring-key-vault-op1.vault.azure.net/secrets/LogicApp-azurementoringlogappsop-URL"
+			},
+			"ExchangeRateSecretKeyVaultUrl": {
+				"type": "string",
+				"value": "https://mentoring-key-vault-op1.vault.azure.net/secrets/ExchangeRateSecret/00202e9be72e4937bc30a4603167012c"
 			}
 		},
 		"globalConfigurations": {

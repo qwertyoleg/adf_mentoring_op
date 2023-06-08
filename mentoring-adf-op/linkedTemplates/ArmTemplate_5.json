@@ -13,6 +13,505 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Movies and Services data flow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "MoviesDBtMovies",
+								"type": "DatasetReference"
+							},
+							"name": "MoviesDBtMovies"
+						},
+						{
+							"dataset": {
+								"referenceName": "MoviesDBtMovieStatus",
+								"type": "DatasetReference"
+							},
+							"name": "MoviesDBtMovieStatus"
+						},
+						{
+							"dataset": {
+								"referenceName": "DataMartDimMovie",
+								"type": "DatasetReference"
+							},
+							"name": "DataMartDimMovieForHash"
+						},
+						{
+							"dataset": {
+								"referenceName": "DataMartDimOnlineService",
+								"type": "DatasetReference"
+							},
+							"name": "DataMartDimMovieService"
+						},
+						{
+							"dataset": {
+								"referenceName": "DataMartDimMovie",
+								"type": "DatasetReference"
+							},
+							"name": "DataMartDimMovie"
+						},
+						{
+							"dataset": {
+								"referenceName": "MoviesDBtOnlineService",
+								"type": "DatasetReference"
+							},
+							"name": "MoviesDBtOnlineService"
+						},
+						{
+							"dataset": {
+								"referenceName": "MoviesDBtOnlineService",
+								"type": "DatasetReference"
+							},
+							"name": "MoviesDBtOnlineServiceForHash"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DataMartDimMovie",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						},
+						{
+							"dataset": {
+								"referenceName": "DataMartDimMovie",
+								"type": "DatasetReference"
+							},
+							"name": "sink3"
+						},
+						{
+							"dataset": {
+								"referenceName": "DataMartDimOnlineService",
+								"type": "DatasetReference"
+							},
+							"name": "sink4"
+						},
+						{
+							"dataset": {
+								"referenceName": "DataMartDimOnlineService",
+								"type": "DatasetReference"
+							},
+							"name": "sink5"
+						}
+					],
+					"transformations": [
+						{
+							"name": "lookupForUpdatedMovies"
+						},
+						{
+							"name": "splitUpdatedMovies"
+						},
+						{
+							"name": "GetMoviesDBHash"
+						},
+						{
+							"name": "GetDataMartHash"
+						},
+						{
+							"name": "lookupDataMartMovies"
+						},
+						{
+							"name": "split1"
+						},
+						{
+							"name": "joinMovieStatus"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "alterRow1"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "lookupForNewServices"
+						},
+						{
+							"name": "split"
+						},
+						{
+							"name": "derivedColumn5"
+						},
+						{
+							"name": "derivedColumn6"
+						},
+						{
+							"name": "derivedColumn7"
+						},
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "split2"
+						},
+						{
+							"name": "derivedColumn8"
+						},
+						{
+							"name": "alterRow2"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          MovieId as integer,",
+						"          MovieIdNK as integer,",
+						"          Budget as integer,",
+						"          HomepagePath as string,",
+						"          Title as string,",
+						"          OriginalTitle as string,",
+						"          ReleaseDate as date,",
+						"          Revenue as long,",
+						"          Runtime as integer,",
+						"          MovieStatusId as integer,",
+						"          AvgVote as decimal(3,1),",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp,",
+						"          SrcFileName as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> MoviesDBtMovies",
+						"source(output(",
+						"          MovieStatusId as integer,",
+						"          MovieStatusName as string,",
+						"          CreatedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> MoviesDBtMovieStatus",
+						"source(output(",
+						"          MovieKey as integer,",
+						"          MovieIdNK as integer,",
+						"          Title as string,",
+						"          ReleaseDate as date,",
+						"          Runtime as integer,",
+						"          MovieStatus as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DataMartDimMovieForHash",
+						"source(output(",
+						"          ServiceKey as integer,",
+						"          ServiceCode as string,",
+						"          ServiceName as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DataMartDimMovieService",
+						"source(output(",
+						"          MovieKey as integer,",
+						"          MovieIdNK as integer,",
+						"          Title as string,",
+						"          ReleaseDate as date,",
+						"          Runtime as integer,",
+						"          MovieStatus as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DataMartDimMovie",
+						"source(output(",
+						"          ServiceId as integer,",
+						"          ServiceCode as string,",
+						"          ServiceName as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> MoviesDBtOnlineService",
+						"source(output(",
+						"          ServiceId as integer,",
+						"          ServiceCode as string,",
+						"          ServiceName as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> MoviesDBtOnlineServiceForHash",
+						"GetMoviesDBHash, GetDataMartHash lookup(split1@oldMovies@MovieIdNK == DataMartDimMovieForHash@MovieIdNK,",
+						"     multiple: true,",
+						"     broadcast: 'auto')~> lookupForUpdatedMovies",
+						"lookupForUpdatedMovies split(MoviesDBHash!=DataMartHash,",
+						"     disjoint: true) ~> splitUpdatedMovies@(UpdatedMovies, OtherMovies)",
+						"split1@oldMovies derive(MoviesDBHash = sha2(256,concat(toString(split1@oldMovies@MovieIdNK), split1@oldMovies@Title, toString(split1@oldMovies@ReleaseDate), toString(split1@oldMovies@Runtime)))) ~> GetMoviesDBHash",
+						"DataMartDimMovieForHash derive(DataMartHash = sha2(256,concat(toString(MovieIdNK), Title, toString(ReleaseDate), toString(Runtime)))) ~> GetDataMartHash",
+						"joinMovieStatus, DataMartDimMovie lookup(MoviesDBtMovies@MovieIdNK == DataMartDimMovie@MovieIdNK,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookupDataMartMovies",
+						"lookupDataMartMovies split(!isNull(DataMartDimMovie@MovieIdNK),",
+						"     disjoint: false) ~> split1@(oldMovies, newMovies)",
+						"MoviesDBtMovies, MoviesDBtMovieStatus join(MoviesDBtMovies@MovieStatusId == MoviesDBtMovieStatus@MovieStatusId,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinMovieStatus",
+						"splitUpdatedMovies@UpdatedMovies derive(ModifiedDate = currentTimestamp()) ~> derivedColumn3",
+						"derivedColumn3 alterRow(updateIf(true())) ~> alterRow1",
+						"split1@newMovies derive(CreatedDate = currentTimestamp(),",
+						"          ModifiedDate = currentTimestamp()) ~> derivedColumn4",
+						"MoviesDBtOnlineService, DataMartDimMovieService lookup(MoviesDBtOnlineService@ServiceCode == DataMartDimMovieService@ServiceCode,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookupForNewServices",
+						"lookupForNewServices split(isNull(DataMartDimMovieService@ServiceCode),",
+						"     disjoint: false) ~> split@(NewService, OldService)",
+						"split@NewService derive(CreatedDate = currentTimestamp(),",
+						"          ModifiedDate = currentTimestamp()) ~> derivedColumn5",
+						"split@OldService derive(OldHash = sha2(256,concat(split@OldService@ServiceCode, split@OldService@ServiceName))) ~> derivedColumn6",
+						"MoviesDBtOnlineServiceForHash derive(NewHash = sha2(256,concat(ServiceCode, ServiceName))) ~> derivedColumn7",
+						"derivedColumn6, derivedColumn7 lookup(split@OldService@ServiceCode == MoviesDBtOnlineServiceForHash@ServiceCode,",
+						"     multiple: true,",
+						"     broadcast: 'auto')~> lookup1",
+						"lookup1 split(OldHash!=NewHash,",
+						"     disjoint: false) ~> split2@(UpdatedServices, OtherServices)",
+						"split2@UpdatedServices derive(ModifiedDate = currentTimestamp()) ~> derivedColumn8",
+						"derivedColumn8 alterRow(updateIf(true())) ~> alterRow2",
+						"derivedColumn4 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          MovieKey as integer,",
+						"          MovieIdNK as integer,",
+						"          Title as string,",
+						"          ReleaseDate as date,",
+						"          Runtime as integer,",
+						"          MovieStatus as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          MovieIdNK = split1@newMovies@MovieIdNK,",
+						"          Title = split1@newMovies@Title,",
+						"          ReleaseDate = split1@newMovies@ReleaseDate,",
+						"          Runtime = split1@newMovies@Runtime,",
+						"          MovieStatus = MovieStatusName,",
+						"          CreatedDate,",
+						"          ModifiedDate",
+						"     )) ~> sink2",
+						"alterRow1 sink(allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     input(",
+						"          MovieKey as integer,",
+						"          MovieIdNK as integer,",
+						"          Title as string,",
+						"          ReleaseDate as date,",
+						"          Runtime as integer,",
+						"          MovieStatus as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          Title = splitUpdatedMovies@UpdatedMovies@Title,",
+						"          ReleaseDate = splitUpdatedMovies@UpdatedMovies@ReleaseDate,",
+						"          Runtime = splitUpdatedMovies@UpdatedMovies@Runtime,",
+						"          MovieStatus = MovieStatusName,",
+						"          CreatedDate = splitUpdatedMovies@UpdatedMovies@CreatedDate,",
+						"          ModifiedDate",
+						"     )) ~> sink3",
+						"derivedColumn5 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          ServiceKey as integer,",
+						"          ServiceCode as string,",
+						"          ServiceName as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ServiceCode = split@NewService@ServiceCode,",
+						"          ServiceName = split@NewService@ServiceName,",
+						"          CreatedDate,",
+						"          ModifiedDate",
+						"     )) ~> sink4",
+						"alterRow2 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          ServiceKey as integer,",
+						"          ServiceCode as string,",
+						"          ServiceName as string,",
+						"          CreatedDate as timestamp,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ServiceCode = split2@UpdatedServices@ServiceCode,",
+						"          ServiceName = split2@UpdatedServices@ServiceName,",
+						"          ModifiedDate",
+						"     )) ~> sink5"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataMart movies data flow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Movies populating data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Movies and Services data flow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"MoviesDBtMovies": {},
+									"MoviesDBtMovieStatus": {},
+									"DataMartDimMovieForHash": {},
+									"DataMartDimMovieService": {},
+									"DataMartDimMovie": {},
+									"MoviesDBtOnlineService": {},
+									"MoviesDBtOnlineServiceForHash": {},
+									"sink2": {},
+									"sink3": {},
+									"sink4": {},
+									"sink5": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "Azure-IR-M8",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-05-16T08:26:44Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/Movies and Services data flow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Fact tables data flow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow for fact tables population",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Fact data flow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"tOnlinePurchise": {},
+									"tOnlineService": {},
+									"tMovies": {},
+									"DimOnlineService": {},
+									"DimMovie": {},
+									"DimDate": {},
+									"DataMartFactOnlinePurchase": {},
+									"tOnlinePurchaseForMonthlySnapshot": {},
+									"tDimOnlineServiceForMonthlySnapshot": {},
+									"DimOnlineServiceForMonthlySnapshot": {},
+									"FactOnlinePurchaseMonthlySnapshot": {},
+									"DataMartFactMonthlySnapshot": {},
+									"FactOnlinePurchase": {},
+									"sinkFactOnlinePurchaseMonthlySnapshot": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "Azure-IR-M8",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-05-16T08:26:51Z"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Master pipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",

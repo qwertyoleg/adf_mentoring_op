@@ -12,6 +12,26 @@
 			"metadata": "Secure string for 'connectionString' of 'SqlServer1'",
 			"defaultValue": "Integrated Security=False;Data Source=EPUALVIW0B55\\MSSQLSERVERFORDF;Initial Catalog=CinemaTickets;User ID=localDBUser"
 		},
+		"AzureBlobStorage service_sasUri": {
+			"type": "secureString",
+			"metadata": "Secure string for 'sasUri' of 'AzureBlobStorage service'"
+		},
+		"AzureBlobStorage service_properties_typeProperties_sasToken_secretName": {
+			"type": "string",
+			"defaultValue": "azurementoringstorageopMoviesURL"
+		},
+		"AzureBlobStorageOnlineContainer_sasUri": {
+			"type": "secureString",
+			"metadata": "Secure string for 'sasUri' of 'AzureBlobStorageOnlineContainer'"
+		},
+		"AzureBlobStorageOnlineContainer_properties_typeProperties_sasToken_secretName": {
+			"type": "string",
+			"defaultValue": "AzureBlobOnlineContainer"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "movieUserConnectionString"
+		},
 		"DataMartLinkedService_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "DataMartConnectionString"
@@ -35,6 +55,68 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage service')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"sasUri": "[parameters('AzureBlobStorage service_sasUri')]",
+					"sasToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "linked_service_to_key_vault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('AzureBlobStorage service_properties_typeProperties_sasToken_secretName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorageOnlineContainer')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"sasUri": "[parameters('AzureBlobStorageOnlineContainer_sasUri')]",
+					"sasToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "linked_service_to_key_vault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('AzureBlobStorageOnlineContainer_properties_typeProperties_sasToken_secretName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "linked_service_to_key_vault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('AzureSqlDatabase1_properties_typeProperties_connectionString_secretName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DataMartLinkedService')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -845,7 +927,9 @@
 				"annotations": [],
 				"lastPublishTime": "2023-03-27T10:26:58Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/load staging data to tOnlineService and tOnlinePurchase tables')]",
@@ -908,7 +992,9 @@
 				"annotations": [],
 				"lastPublishTime": "2023-04-24T15:04:59Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureBlobOnlineContainer')]",
@@ -959,7 +1045,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageOnlineContainer')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
@@ -1083,7 +1171,9 @@
 					"table": "movies_metadata"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable_stg_online_purchase')]",
@@ -1139,7 +1229,9 @@
 					"table": "online_purchase"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable_tOnlinePurchase')]",
@@ -1211,7 +1303,9 @@
 					"table": "tOnlinePurchase"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Binary_datasource_connection_to_blob')]",
@@ -1231,7 +1325,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage service')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/CinemaTicketsLocalDB')]",
@@ -1391,169 +1487,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "DimOnlineService"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/DataMartLinkedService')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataMartParameterized')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DataMartLinkedService",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/DataMartLinkedService')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataMart_DimDate')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DataMartLinkedService",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TheDateKey",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TheDate",
-						"type": "date"
-					},
-					{
-						"name": "TheDay",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TheDayName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TheWeek",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TheISOWeek",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TheDayOfWeek",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TheMonth",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TheMonthName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TheQuarter",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TheYear",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TheFirstOfMonth",
-						"type": "date"
-					},
-					{
-						"name": "TheLastOfYear",
-						"type": "date"
-					},
-					{
-						"name": "TheDayOfYear",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DimDate"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/DataMartLinkedService')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataMart_FactOnlinePurchase')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DataMartLinkedService",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "DateKey",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "OnlineServiceKey",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "MovieKey",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "Price",
-						"type": "decimal",
-						"precision": 4,
-						"scale": 1
-					},
-					{
-						"name": "TransactionId",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "FactOnlinePurchase"
 				}
 			},
 			"dependsOn": [

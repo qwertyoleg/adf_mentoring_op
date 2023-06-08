@@ -171,21 +171,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"AzureBlobStorage service_sasUri": {
-						"value": "[parameters('AzureBlobStorage service_sasUri')]"
-					},
-					"AzureBlobStorage service_properties_typeProperties_sasToken_secretName": {
-						"value": "[parameters('AzureBlobStorage service_properties_typeProperties_sasToken_secretName')]"
-					},
-					"AzureBlobStorageOnlineContainer_sasUri": {
-						"value": "[parameters('AzureBlobStorageOnlineContainer_sasUri')]"
-					},
-					"AzureBlobStorageOnlineContainer_properties_typeProperties_sasToken_secretName": {
-						"value": "[parameters('AzureBlobStorageOnlineContainer_properties_typeProperties_sasToken_secretName')]"
-					},
-					"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('AzureSqlDatabase1_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -209,6 +194,21 @@
 					},
 					"SqlServer1_connectionString": {
 						"value": "[parameters('SqlServer1_connectionString')]"
+					},
+					"AzureBlobStorage service_sasUri": {
+						"value": "[parameters('AzureBlobStorage service_sasUri')]"
+					},
+					"AzureBlobStorage service_properties_typeProperties_sasToken_secretName": {
+						"value": "[parameters('AzureBlobStorage service_properties_typeProperties_sasToken_secretName')]"
+					},
+					"AzureBlobStorageOnlineContainer_sasUri": {
+						"value": "[parameters('AzureBlobStorageOnlineContainer_sasUri')]"
+					},
+					"AzureBlobStorageOnlineContainer_properties_typeProperties_sasToken_secretName": {
+						"value": "[parameters('AzureBlobStorageOnlineContainer_properties_typeProperties_sasToken_secretName')]"
+					},
+					"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('AzureSqlDatabase1_properties_typeProperties_connectionString_secretName')]"
 					},
 					"DataMartLinkedService_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('DataMartLinkedService_properties_typeProperties_connectionString_secretName')]"

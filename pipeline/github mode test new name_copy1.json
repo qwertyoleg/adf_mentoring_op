@@ -1,0 +1,130 @@
+{
+	"name": "github mode test new name_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get exchange rate",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Get api secret",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat('http://api.exchangeratesapi.io/v1/latest?access_key=',string(activity('Get api secret').output.value),'&symbols=CAD,GBP,USD')",
+						"type": "Expression"
+					},
+					"method": "GET"
+				}
+			},
+			{
+				"name": "Set CAD exchange rate to EUR",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get exchange rate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "CAD",
+					"value": {
+						"value": "@string(activity('Get exchange rate').output.rates.CAD)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set GBP exchange rate to EUR",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get exchange rate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "GBP",
+					"value": {
+						"value": "@string(activity('Get exchange rate').output.rates.GBP)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set USD exchange rate to EUR",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get exchange rate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "USD",
+					"value": {
+						"value": "@string(activity('Get exchange rate').output.rates.USD)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Get api secret",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat(string(pipeline().globalParameters.ExchangeRateSecretKeyVaultUrl), '?api-version=7.0')",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			}
+		],
+		"variables": {
+			"GBP": {
+				"type": "String"
+			},
+			"CAD": {
+				"type": "String"
+			},
+			"USD": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
